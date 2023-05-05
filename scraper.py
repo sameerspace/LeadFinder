@@ -11,17 +11,20 @@ link = "https://www.google.com/maps/search/electrician+in+Chicago,+IL,+USA/@41.8
 url = "https://www.google.com/maps/search/pizza+in+Karachi,Pakistan/"
 
 
+# options = webdriver.ChromeOptions()
+# options.add_argument("headless")
+
 browser = webdriver.Chrome()
 record = []
 e = []
 le = 0
 
 
-def Selenium_extractor():
+def Selenium_extractor(limit):
     action = ActionChains(browser)
     a = browser.find_elements(By.CLASS_NAME, "hfpxzc")
 
-    while len(a) < 1000:
+    while len(a) < limit:
         print(len(a))
         var = len(a)
         scroll_origin = ScrollOrigin.from_element(a[len(a) - 1])
@@ -46,8 +49,8 @@ def Selenium_extractor():
         soup = BeautifulSoup(source, "html.parser")
         try:
             Name_Html = soup.findAll("h1", {"class": "DUwDvf fontHeadlineLarge"})
-
             name = Name_Html[0].text
+            phone = ""
             if name not in e:
                 e.append(name)
                 divs = soup.findAll("div", {"class": "Io6YTe fontBodyMedium"})
@@ -57,10 +60,12 @@ def Selenium_extractor():
 
                 Address_Html = divs[0]
                 address = Address_Html.text
+                print("Address OK")
                 try:
                     for z in range(len(divs)):
                         if str(divs[z].text)[-4] == "." or str(divs[z].text)[-3] == ".":
                             website = divs[z].text
+                    print("Website OK")
                 except:
                     website = "Not available"
                 print([name, phone, address, website])
@@ -69,12 +74,12 @@ def Selenium_extractor():
                     record, columns=["Name", "Phone number", "Address", "Website"]
                 )  # writing data to the file
                 df.to_csv(filename + ".csv", index=False, encoding="utf-8")
-        except:
-            print("error")
+        except Exception as error:
+            print(error.__str__())
             continue
 
 
-def run_parse(link):
-    browser.get(str(link))
+def run_parse(link, search_limit):
+    browser.get(link)
     time.sleep(10)
-    Selenium_extractor()
+    Selenium_extractor(int(search_limit))

@@ -38,9 +38,11 @@ def index(request: Request):
 # http://localhost:8000/search/?query=pizza&country=pakistan&city=karachi
 @app.get("/search/")
 def search(query: str):
-    # link = f"https://www.google.com/maps/search/{query}+in+{city},{country}/"
-    link = f"https://www.google.com/maps/search/{query}"
-    run_parse(link)
+    q = query.split("limit=")
+    qry = q[0][:-1]
+    link = f"https://www.google.com/maps/search/{qry}"
+    print(f"Running scraper on {link}")
+    run_parse(link, q[1])
     return {"response": f"Scraper ran succesfully {query}"}
 
 
